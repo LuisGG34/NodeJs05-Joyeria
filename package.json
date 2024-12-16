@@ -1,0 +1,19 @@
+{
+  "name": "Desafio05NodeJs",
+  "version": "1.0.0",
+  "description": "Proyecto para el desafío de Tienda de Joyas",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
+
