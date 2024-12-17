@@ -1,4 +1,3 @@
-// controllers/joyasController.js
 
 // Importa las funciones del modelo que interactúan con la base de datos.
 const { obtenerJoyas, filtrarJoyas } = require('../models/joyasModel');

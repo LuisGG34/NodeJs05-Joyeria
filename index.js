@@ -1,4 +1,3 @@
-// app.js
 
 // Carga las variables de entorno desde un archivo .env para usarlas en la configuración del proyecto.
 require('dotenv').config();

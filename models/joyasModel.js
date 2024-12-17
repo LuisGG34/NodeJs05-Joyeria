@@ -1,7 +1,7 @@
-// models/joyasModel.js
 
 // Importa el objeto `pool` desde el archivo `db.js` para interactuar con la base de datos.
 const { pool } = require('../db');
+const format = require('pg-format'); // Importa el paquete pg-format
 
 // Define una función asincrónica para obtener todas las joyas con paginación y ordenamiento.
 const obtenerJoyas = async (query) => {
@@ -15,15 +15,14 @@ const obtenerJoyas = async (query) => {
     // Si `order_by` no se especifica, se ordena por defecto por `id` de forma ascendente.
     const order = order_by ? order_by.replace('_', ' ') : 'id ASC';
 
-    // Define la consulta SQL parametrizada para obtener las joyas con paginación y ordenamiento.
-    const queryText = `
+    // Construye la consulta SQL utilizando pg-format y los parámetros con %s.
+    const queryText = format(`
         SELECT * FROM inventario
-        ORDER BY ${order}
-        LIMIT $1 OFFSET $2;
-    `;
+        ORDER BY %s
+        LIMIT %s OFFSET %s;`, order, limits || 10, offset);
 
-    // Ejecuta la consulta SQL utilizando `pool.query` con los valores proporcionados.
-    const result = await pool.query(queryText, [limits || 10, offset]);
+    // Ejecuta la consulta SQL utilizando `pool.query`.
+    const result = await pool.query(queryText);
 
     // Devuelve las filas obtenidas de la base de datos.
     return result.rows;
@@ -34,17 +33,21 @@ const filtrarJoyas = async (query) => {
     // Extrae los parámetros de la consulta: precio mínimo, precio máximo, categoría y metal.
     const { precio_min, precio_max, categoria, metal } = query;
 
-    // Define la consulta SQL parametrizada para filtrar las joyas.
-    const queryText = `
+    // Construye la consulta SQL utilizando pg-format y los parámetros con %s.
+    const queryText = format(`
         SELECT * FROM inventario
-        WHERE ($1::INT IS NULL OR precio >= $1)
-          AND ($2::INT IS NULL OR precio <= $2)
-          AND ($3::TEXT IS NULL OR categoria = $3)
-          AND ($4::TEXT IS NULL OR metal = $4);
-    `;
+        WHERE (%L IS NULL OR precio >= %s)
+          AND (%L IS NULL OR precio <= %s)
+          AND (%L IS NULL OR categoria = %L)
+          AND (%L IS NULL OR metal = %L);`,
+        precio_min, precio_min,
+        precio_max, precio_max,
+        categoria, categoria,
+        metal, metal
+    );
 
-    // Ejecuta la consulta SQL utilizando `pool.query` con los valores proporcionados.
-    const result = await pool.query(queryText, [precio_min, precio_max, categoria, metal]);
+    // Ejecuta la consulta SQL utilizando `pool.query`.
+    const result = await pool.query(queryText);
 
     // Devuelve las filas obtenidas de la base de datos.
     return result.rows;
@@ -52,4 +55,5 @@ const filtrarJoyas = async (query) => {
 
 // Exporta las funciones `obtenerJoyas` y `filtrarJoyas` para que puedan ser utilizadas en otros archivos.
 module.exports = { obtenerJoyas, filtrarJoyas };
+
 
